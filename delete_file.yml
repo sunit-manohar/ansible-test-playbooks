@@ -1,18 +1,23 @@
 ---
-- name: Create a file on target host
+- name: Delete a test file on target host
   hosts: all
   become: false
   tasks:
-    - name: Create the file with some content
-      copy:
-        content: "This file was created by Ansible at {{ ansible_date_time.iso8601 }}\n"
-        dest: /tmp/ansible_managed_file.txt
+    - name: Create a test file
+      file:
+        path: /tmp/test_ansible_delete.txt
+        state: touch
 
-    - name: Confirm file exists
+    - name: Delete the test file
+      file:
+        path: /tmp/test_ansible_delete.txt
+        state: absent
+
+    - name: Confirm deletion
       stat:
-        path: /tmp/ansible_managed_file.txt
-      register: file_info
+        path: /tmp/test_ansible_delete.txt
+      register: file_check
 
-    - name: Report creation result
+    - name: Report result
       debug:
-        msg: "File created: {{ file_info.stat.exists }}, Size: {{ file_info.stat.size }} bytes"
+        msg: "File deleted successfully: {{ not file_check.stat.exists }}"
