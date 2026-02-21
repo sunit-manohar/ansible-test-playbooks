@@ -1,0 +1,25 @@
+---
+- name: Read file and report size on target host
+  hosts: all
+  become: false
+  tasks:
+    - name: Check file stats
+      stat:
+        path: /tmp/ansible_managed_file.txt
+      register: file_info
+
+    - name: Read file content
+      slurp:
+        src: /tmp/ansible_managed_file.txt
+      register: file_content
+      when: file_info.stat.exists
+
+    - name: Report file size and content
+      debug:
+        msg: "File size: {{ file_info.stat.size }} bytes | Content: {{ file_content.content | b64decode }}"
+      when: file_info.stat.exists
+
+    - name: Report if file missing
+      debug:
+        msg: "File does not exist at /tmp/ansible_managed_file.txt"
+      when: not file_info.stat.exists
