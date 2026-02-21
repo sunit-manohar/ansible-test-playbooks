@@ -1,0 +1,23 @@
+---
+- name: Delete a test file on target host
+  hosts: all
+  become: false
+  tasks:
+    - name: Create a test file
+      file:
+        path: /tmp/test_ansible_delete.txt
+        state: touch
+
+    - name: Delete the test file
+      file:
+        path: /tmp/test_ansible_delete.txt
+        state: absent
+
+    - name: Confirm deletion
+      stat:
+        path: /tmp/test_ansible_delete.txt
+      register: file_check
+
+    - name: Report result
+      debug:
+        msg: "File deleted successfully: {{ not file_check.stat.exists }}"
