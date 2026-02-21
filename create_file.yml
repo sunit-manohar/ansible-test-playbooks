@@ -1,0 +1,18 @@
+---
+- name: Create a file on target host
+  hosts: all
+  become: false
+  tasks:
+    - name: Create the file with some content
+      copy:
+        content: "This file was created by Ansible at {{ ansible_date_time.iso8601 }}\n"
+        dest: /tmp/ansible_managed_file.txt
+
+    - name: Confirm file exists
+      stat:
+        path: /tmp/ansible_managed_file.txt
+      register: file_info
+
+    - name: Report creation result
+      debug:
+        msg: "File created: {{ file_info.stat.exists }}, Size: {{ file_info.stat.size }} bytes"
