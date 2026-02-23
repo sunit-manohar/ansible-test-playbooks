@@ -2,6 +2,9 @@
 - name: Create a file on target host
   hosts: all
   become: false
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.9   # ← removes the WARNING
   tasks:
     - name: Create the file with some content
       copy:
