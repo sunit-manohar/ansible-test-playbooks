@@ -2,20 +2,18 @@
 - name: Delete a test file on target host
   hosts: all
   become: false
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.9
   tasks:
-    - name: Create a test file
-      file:
-        path: /tmp/test_ansible_delete.txt
-        state: touch
-
     - name: Delete the test file
       file:
-        path: /tmp/test_ansible_delete.txt
+        path: /tmp/ansible_managed_file.txt
         state: absent
 
     - name: Confirm deletion
       stat:
-        path: /tmp/test_ansible_delete.txt
+        path: /tmp/ansible_managed_file.txt
       register: file_check
 
     - name: Report result
