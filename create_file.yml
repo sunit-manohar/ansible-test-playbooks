@@ -2,13 +2,13 @@
 - name: Create a file on target host
   hosts: all
   become: false
-  gather_facts: false
+  gather_facts: false        # ← removes TASK [Gathering Facts] entirely
   vars:
     ansible_python_interpreter: /usr/bin/python3.9   # ← removes the WARNING
   tasks:
     - name: Create the file with some content
       copy:
-        content: "This file was created by Ansible at {{ ansible_date_time.iso8601 }}\n"
+        content: "This file was created by Ansible at {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}\n"
         dest: /tmp/ansible_managed_file.txt
 
     - name: Confirm file exists
