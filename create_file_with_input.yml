@@ -1,0 +1,27 @@
+---
+- name: Create a file on target host
+  hosts: all
+  become: false
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.9
+    file_path: "/tmp/ansible_managed_file.txt"    # default value if not passed
+  tasks:
+    - name: Validate file path is provided
+      fail:
+        msg: "file_path variable is required. Pass it using extra_vars."
+      when: file_path is not defined or file_path | trim == ""
+
+    - name: Create the file with some content
+      copy:
+        content: "This file was created by Ansible at {{ lookup('pipe', 'date -u +%Y-%m-%dT%H:%M:%SZ') }}\n"
+        dest: "{{ file_path }}"
+
+    - name: Confirm file exists
+      stat:
+        path: "{{ file_path }}"
+      register: file_info
+
+    - name: Report creation result
+      debug:
+        msg: "File created: {{ file_info.stat.exists }}, Path: {{ file_path }}, Size: {{ file_info.stat.size }} bytes"
