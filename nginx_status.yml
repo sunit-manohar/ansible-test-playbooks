@@ -1,0 +1,36 @@
+---
+- name: Check nginx status
+  hosts: all
+  become: true
+
+  tasks:
+    - name: systemd is-active
+      ansible.builtin.command: systemctl is-active nginx
+      register: ngx_active
+      changed_when: false
+      failed_when: false
+
+    - name: systemd is-enabled (on boot)
+      ansible.builtin.command: systemctl is-enabled nginx
+      register: ngx_enabled
+      changed_when: false
+      failed_when: false
+
+    - name: Show service state
+      ansible.builtin.debug:
+        msg:
+          - "Active: {{ ngx_active.stdout | default('unknown') }}"
+          - "Enabled: {{ ngx_enabled.stdout | default('unknown') }}"
+
+    - name: Optional — HTTP check on localhost
+      ansible.builtin.uri:
+        url: http://127.0.0.1/
+        method: GET
+        status_code: [200, 301, 302, 403]
+        timeout: 5
+      register: http_check
+      failed_when: false
+
+    - name: Show HTTP check
+      ansible.builtin.debug:
+        msg: "HTTP 127.0.0.1: status={{ http_check.status | default('skipped/failed') }}"
