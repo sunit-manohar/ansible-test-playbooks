@@ -17,7 +17,7 @@
       condition: event.payload.alertType == "nginx_down"
       action:
         run_job_template:
-          name: Nginx_Start
+          name: nginx_restart
           organization: Default
           job_args:
             limit: "{{ event.payload.targetHost }}"
