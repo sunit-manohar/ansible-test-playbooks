@@ -8,11 +8,6 @@
         port: 5000
 
   rules:
-    - name: Log every incoming event
-      condition: event.payload is defined
-      action:
-        debug:
-
     - name: Restart nginx on nginx_down alert
       condition: event.payload.alertType == "nginx_down"
       action:
@@ -23,3 +18,17 @@
             limit: "{{ event.payload.targetHost }}"
             extra_vars:
               lm_alert_id: "{{ event.payload.alertId }}"
+
+    - name: Stop nginx on maintenance event
+      condition: event.payload.alertType == "nginx_maintenance"
+      action:
+        run_job_template:
+          name: nginx-stop
+          organization: Default
+          job_args:
+            limit: "{{ event.payload.targetHost }}"
+
+    - name: Log unmatched events
+      condition: event.payload is defined
+      action:
+        debug:
